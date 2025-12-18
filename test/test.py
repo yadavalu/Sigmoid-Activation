@@ -3,7 +3,7 @@
 
 import cocotb
 from cocotb.clock import Clock
-from cocotb.triggers import ClockCycles
+from cocotb.triggers import ClockCycles, Timer
 
 
 @cocotb.test()
@@ -14,7 +14,13 @@ async def test_project(dut):
     clock = Clock(dut.clk, 10, unit="us")
     cocotb.start_soon(clock.start())
 
-    # Reset
+    dut._log.info("Test project behavior")
+
+    for i in range(-40, 40):
+        await test_value(dut, i)
+
+
+async def reset(dut):
     dut._log.info("Reset")
     dut.ena.value = 1
     dut.ui_in.value = 0
@@ -23,18 +29,26 @@ async def test_project(dut):
     await ClockCycles(dut.clk, 10)
     dut.rst_n.value = 1
 
-    dut._log.info("Test project behavior")
+async def test_value(dut, ui_in):
+    expected_output = ui_in << 2
+    expected_output += 128
 
-    # Set the input values you want to test
-    dut.ui_in.value = 20
-    dut.uio_in.value = 30
+    if ui_in <= -32:
+        expected_output = 0
+    elif ui_in >= 32:
+        expected_output = 255
+
+    dut._log.info(f"Test ui_in={ui_in}, expected uo_out={expected_output}")
+    
+    await reset(dut)
+
+    dut.ui_in.value = ui_in
+    #dut.uio_in.value = 0  # Dummy
 
     # Wait for one clock cycle to see the output values
     await ClockCycles(dut.clk, 1)
 
-    # The following assersion is just an example of how to check the output values.
-    # Change it to match the actual expected output of your module:
-    assert dut.uo_out.value == 50
+    # Wait to update registers
+    await Timer(1, units="ns") 
 
-    # Keep testing the module by changing the input values, waiting for
-    # one or more clock cycles, and asserting the expected output values.
+    assert dut.uo_out.value == expected_output, f"Expected uo_out to be {expected_output} for ui_in={ui_in}, but got {dut.uo_out.value}"
