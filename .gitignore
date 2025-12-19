@@ -12,3 +12,4 @@ test/__pycache__/
 test/results.xml
 test/gate_level_netlist.v
 cocotb-env/
+example/test/mnist_model.keras

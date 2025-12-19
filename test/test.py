@@ -16,7 +16,7 @@ async def test_project(dut):
 
     dut._log.info("Test project behavior")
 
-    for i in range(-40, 40):
+    for i in range(40, -40, -1):
         await test_value(dut, i)
 
 
@@ -52,3 +52,5 @@ async def test_value(dut, ui_in):
     await Timer(1, units="ns") 
 
     assert dut.uo_out.value == expected_output, f"Expected uo_out to be {expected_output} for ui_in={ui_in}, but got {dut.uo_out.value}"
+
+    dut._log.info(f"Passed for ui_in={ui_in}, received uo_out={dut.uo_out.value}")
