@@ -49,7 +49,7 @@ async def test_value(dut, ui_in):
     await ClockCycles(dut.clk, 1)
 
     # Wait to update registers
-    await Timer(1, unit="ns") 
+    await Timer(10, unit="ns") 
 
     assert dut.uo_out.value == expected_output, f"Expected uo_out to be {expected_output} for ui_in={ui_in}, but got {dut.uo_out.value}"
 
