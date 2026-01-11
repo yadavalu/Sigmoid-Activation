@@ -61,4 +61,6 @@ module tt_um_sigmoid_8bit (
     // Assign registered output to pins
     assign uo_out = y_reg;
 
+    wire _unused = &{uio_in, ena};
+
 endmodule
